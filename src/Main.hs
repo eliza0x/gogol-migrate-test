@@ -31,7 +31,7 @@ uploadExample = do
     env  <- G.newEnv <&> (G.envLogger .~ lgr) . (G.envScopes .~ Storage.storageReadWriteScope) -- (2) (3)
     body <- G.sourceBody "goat.webp"
     C.runResourceT . G.runGoogle env $ do
-        G.upload (Storage.objectsInsert bkt Storage.object' & Storage.oiName ?~ key) body
+        -- G.upload (Storage.objectsInsert bkt Storage.object' & Storage.oiName ?~ key) body
 
         -- stream <- G.download $ Storage.objectsGet bkt key
 	-- l <- liftResourceT $ runConduit (stream .| CC.sinkList)

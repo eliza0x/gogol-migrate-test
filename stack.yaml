@@ -1,5 +1,5 @@
-resolver: lts-18.28
-# resolver: lts-19.0 # aesonの変更で不可能
+resolver: lts-19.33 # ok
+# resolver: lts-20.0 # bytestringでgogolがコケる
 
 packages:
 - .

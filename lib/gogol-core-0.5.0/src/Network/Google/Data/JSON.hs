@@ -18,28 +18,28 @@ module Network.Google.Data.JSON
     , toJSONText
 
     -- * Re-exports
-    , FromJSON (..)
-    , ToJSON   (..)
+    , Aeson.FromJSON (..)
+    , Aeson.ToJSON   (..)
 
-    , withObject
-    , emptyObject
-    , object
+    , Aeson.withObject
+    , Aeson.emptyObject
+    , Aeson.object
 
-    , (.=)
-    , (.:)
-    , (.:?)
-    , (.!=)
+    , (Aeson..=)
+    , (Aeson..:)
+    , (Aeson..:?)
+    , (Aeson..!=)
     ) where
 
-import           Data.Aeson
-import           Data.Aeson.Types
+import           qualified Data.Aeson as Aeson
+import           qualified Data.Aeson.Types as Aeson
 import           Data.Data
 import           Data.HashMap.Strict (HashMap)
 import           Data.Text           (Text)
 import qualified Data.Text           as Text
 import           Web.HttpApiData     (FromHttpApiData (..), ToHttpApiData (..))
 
-type JSONValue = Value
+type JSONValue = Aeson.Value
 
 newtype Textual a = Textual a
     deriving
@@ -55,21 +55,21 @@ newtype Textual a = Textual a
         , FromHttpApiData
         )
 
-instance (FromJSON a, FromHttpApiData a) => FromJSON (Textual a) where
-    parseJSON (String s) =
+instance (Aeson.FromJSON a, FromHttpApiData a) => Aeson.FromJSON (Textual a) where
+    parseJSON (Aeson.String s) =
         either (fail . Text.unpack) (pure . Textual) (parseQueryParam s)
-    parseJSON o          = Textual <$> parseJSON o
+    parseJSON o          = Textual <$> Aeson.parseJSON o
 
-instance ToHttpApiData a => ToJSON (Textual a) where
-    toJSON (Textual x) = String (toQueryParam x)
+instance ToHttpApiData a => Aeson.ToJSON (Textual a) where
+    toJSON (Textual x) = Aeson.String (toQueryParam x)
 
-parseJSONObject :: FromJSON a => HashMap Text Value -> Parser a
-parseJSONObject = parseJSON . Object
+parseJSONObject :: Aeson.FromJSON a => Aeson.Object -> Aeson.Parser a
+parseJSONObject = Aeson.parseJSON . Aeson.Object
 
-parseJSONText :: FromHttpApiData a => String -> Value -> Parser a
-parseJSONText n = withText n (either (fail . f) pure . parseQueryParam)
+parseJSONText :: FromHttpApiData a => String -> Aeson.Value -> Aeson.Parser a
+parseJSONText n = Aeson.withText n (either (fail . f) pure . parseQueryParam)
   where
     f x = n ++ " - " ++ Text.unpack x
 
-toJSONText :: ToHttpApiData a => a -> Value
-toJSONText = String . toQueryParam
+toJSONText :: ToHttpApiData a => a -> Aeson.Value
+toJSONText = Aeson.String . toQueryParam
