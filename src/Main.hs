@@ -23,15 +23,13 @@ import qualified Data.ByteString.Char8 as BC
 key = "goat.webp"
 bkt = "nobanashi-images"
 
--- uploadExample :: ResourceT IO (ConduitM () ByteString (ResourceT IO) ())
--- uploadExample :: IO [ByteString]
-uploadExample :: IO ST.Objects
-uploadExample = do
+example :: IO ST.Objects
+example = do
     lgr  <- G.newLogger G.Debug stdout                                               -- (1)
     env  <- G.newEnv <&> (G.envLogger .~ lgr) . (G.envScopes .~ Storage.storageReadWriteScope) -- (2) (3)
     body <- G.sourceBody "goat.webp"
     C.runResourceT . G.runGoogle env $ do
-        -- G.upload (Storage.objectsInsert bkt Storage.object' & Storage.oiName ?~ key) body
+        G.upload (Storage.objectsInsert bkt Storage.object' & Storage.oiName ?~ key) body
 
         -- stream <- G.download $ Storage.objectsGet bkt key
 	-- l <- liftResourceT $ runConduit (stream .| CC.sinkList)
@@ -42,7 +40,7 @@ uploadExample = do
 
 main :: IO ()
 main = do
-  output <- uploadExample 
+  output <- example 
   putStrLn "----"
   mapM_ (print . L.view ST.objName) $ output ^. ST.oItems 
 
